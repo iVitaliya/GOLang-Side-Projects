@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	keyboard "github.com/eiannone/keyboard"
 	colors "github.com/iVitaliya/colors-go"
@@ -12,13 +11,17 @@ import (
 )
 
 var frames = []string{
-	colors.BgWhite(colors.Black("1.")) + " " + colors.BgBlack(colors.White("This is test 1.")),
-	colors.BgWhite(colors.Black("2.")) + " " + colors.BgBlack(colors.White("This is test 2.")),
-	colors.BgWhite(colors.Black("3.")) + " " + colors.BgBlack(colors.White("This is test 3.")),
+	colors.BgBlack(colors.White("1.")) + " " + colors.BgBlack(colors.White("This is test 1.")),
+	colors.BgBlack(colors.White("2.")) + " " + colors.BgBlack(colors.White("This is test 2.")),
+	colors.BgBlack(colors.White("3.")) + " " + colors.BgBlack(colors.White("This is test 3.")),
 }
 
-func animate() {
+func animate(ind int) string {
+	arr := make([]string, len(frames))
 
+	frames[ind] = colors.BgWhite(colors.Black(frames[ind]))
+
+	return frames[ind]
 }
 
 func main() {
@@ -42,13 +45,15 @@ func main() {
 		}()
 
 		fmt.Println("Press ESC to exit the menu.")
+		fmt.Println("\n" + strings.Join(frames, "\n"))
+		var i int = 0
 
 		app.QueueUpdateDraw(func() {
 			textView.SetText(strings.Join(frames, "\n"))
 		})
 
 		for {
-			char, key, err := keyboard.GetKey()
+			_, key, err := keyboard.GetKey()
 			if err != nil {
 				panic(err)
 			}
@@ -56,8 +61,17 @@ func main() {
 			switch key {
 			case keyboard.KeyEsc:
 				os.Exit(0)
-			case 
-			} 
+			case keyboard.KeyArrowDown:
+				if i != len(frames)-1 {
+					i = i + 1
+					animate(i)
+				}
+			case keyboard.KeyArrowUp:
+				if i == 0 || i < len(frames)-1 {
+					i = i - 1
+					animate(i)
+				}
+			}
 		}
 	}()
 
