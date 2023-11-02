@@ -1,66 +1,67 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"log"
-	"os/exec"
+	"os"
 	"strings"
 	"time"
+
+	keyboard "github.com/eiannone/keyboard"
+	colors "github.com/iVitaliya/colors-go"
+	tview "github.com/rivo/tview"
 )
 
-// https://zetcode.com/golang/exec-command/
-func runCommandWithParams(cmd string, cmd_args ...string) {
-	args := strings.Join(cmd_args, " ")
-
-	command := exec.Command(cmd, args)
-
-	var out bytes.Buffer
-	command.Stdout = &out
-
-	err := command.Run()
-
-	if err != nil {
-		log.Fatal(err)
-	}
+var frames = []string{
+	colors.BgWhite(colors.Black("1.")) + " " + colors.BgBlack(colors.White("This is test 1.")),
+	colors.BgWhite(colors.Black("2.")) + " " + colors.BgBlack(colors.White("This is test 2.")),
+	colors.BgWhite(colors.Black("3.")) + " " + colors.BgBlack(colors.White("This is test 3.")),
 }
 
-func runCommand(cmd string) {
-	command := exec.Command("cmd")
+func animate() {
 
-	var out bytes.Buffer
-	command.Stdout = &out
-
-	err := command.Run()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func clearConsole() {
-	runCommand("cls") // Clear the console
-}
-
-func displayFrame(frame string) {
-	clearConsole()
-	fmt.Println(frame)
-}
-
-func animate(frames []string, delay time.Duration) {
-	for _, frame := range frames {
-		displayFrame(frame)
-		time.Sleep(delay)
-	}
 }
 
 func main() {
-	frames := []string{
-		"Frame 1",
-		"Frame 2",
-		"Frame 3",
-		"Frame 4",
-	}
+	app := tview.NewApplication()
 
-	animate(frames, 500*time.Millisecond)
+	textView := tview.NewTextView().
+		SetText("Animating...").
+		SetTextAlign(tview.AlignCenter).
+		SetSize(30, 30)
+
+	app.SetRoot(textView, true)
+
+	go func() {
+		err := keyboard.Open()
+		if err != nil {
+			panic(err)
+		}
+
+		defer func() {
+			_ = keyboard.Close()
+		}()
+
+		fmt.Println("Press ESC to exit the menu.")
+
+		app.QueueUpdateDraw(func() {
+			textView.SetText(strings.Join(frames, "\n"))
+		})
+
+		for {
+			char, key, err := keyboard.GetKey()
+			if err != nil {
+				panic(err)
+			}
+
+			switch key {
+			case keyboard.KeyEsc:
+				os.Exit(0)
+			case 
+			} 
+		}
+	}()
+
+	if err := app.Run(); err != nil {
+		panic(err)
+	}
 }
